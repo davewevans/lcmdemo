@@ -1,0 +1,65 @@
+﻿@page "/inlineeditor2"
+
+<h3>InlineEditorExample2</h3>
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.InPlaceEditor
+
+<table class="table-section">
+    <tr>
+        <td class="sample-td"> Enter your name: </td>
+        <td class="sample-td">
+            <SfInPlaceEditor Name="Skill" 
+                             Url="https://localhost:44352/api/academics" 
+                             PrimaryKey="FrameWork" 
+                             Adaptor="AdaptorType.UrlAdaptor" 
+                             Mode="RenderMode.Inline" 
+                             EnableEditMode="true" 
+                             Type="InputType.Mask" 
+                             Value="MultiSelectValue" 
+                             SubmitOnEnter="true" 
+                             Model="MultiSelectData">
+                <InPlaceEditorEvents OnActionSuccess="OnSuccess" OnActionFailure="OnFailure" TValue="string">
+                    
+                </InPlaceEditorEvents>
+            </SfInPlaceEditor>
+        </td>
+    </tr>
+</table>
+
+<style>
+    .table-section {
+        margin: 0 auto;
+    }
+
+    tr td:first-child {
+        text-align: right;
+        padding-right: 20px;
+    }
+
+    .sample-td {
+        padding-top: 10px;
+        min-width: 230px;
+        height: 100px;
+    }
+</style>
+
+@code {
+    public string[] MultiSelectValue = new string[] { "JavaScript", "jQuery" };
+
+    public Syncfusion.Blazor.InPlaceEditor.MultiSelectModel<string> MultiSelectData = new Syncfusion.Blazor.InPlaceEditor.MultiSelectModel<string>()
+    {
+        Placeholder = "Select skill",
+        Mode = VisualMode.Box,
+        DataSource = new string[] { "Android", "JavaScript", "jQuery", "TypeScript", "Angular", "React", "Vue", "Ionic" }
+    };
+
+    public void OnSuccess(ActionEventArgs args)
+    {
+        Console.WriteLine("OnSuccess triggered: " + args.Value);
+    }
+    
+    public void OnFailure(ActionEventArgs args)
+    {
+        Console.WriteLine("OnFailure triggered: " +  args.Value);
+    }
+}

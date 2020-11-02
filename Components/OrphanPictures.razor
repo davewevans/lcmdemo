@@ -1,0 +1,32 @@
+﻿<div class="m-10">
+    <div class="md:flex mt-4 mb-8 bg-blue-100 p-4 items-center justify-between">
+        <div class="flex items-center text-blue-600">
+            <i class="fa fa-picture text-yellow-600 font-bold text-2xl mr-3"></i>
+            <h3 class="text-2xl font-semibold mt-1">Pictures</h3>
+        </div>
+    </div> 
+    
+    
+    <div class="mb-4">
+        <OrphanPhotoUpload Orphan="@Orphan" IsProfilePhoto="@false" HandlePostUpload="@HandlePostUpload" />
+    </div>
+    <div class="grid grid-cols-3 gap-4">
+        @{
+            if (Orphan?.Pictures != null)
+            {
+                foreach (var picture in Orphan.Pictures)
+                {
+                    string picUrl = $"{picture.BaseUrl}{picture.PictureFileName}";
+                    <div>
+                        <img src="@picUrl" alt="@Orphan.FullName"/>
+                    </div>
+                }
+            }
+        }
+    </div>
+    
+</div>
+
+
+
+

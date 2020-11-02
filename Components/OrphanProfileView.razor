@@ -1,0 +1,36 @@
+﻿<div class="md:flex width-full items-start mb-8">
+    <div class="w-1/2">
+        <OrphanProfilePhoto Orphan="@Orphan"/>
+    </div>
+    <div class="w-1/2 text-2xl">
+        <div class="flex items-start mb-4">
+            <p class="mr-4">First Name:</p>
+            <p class="font-bold text-blue-900">@Orphan.FirstName</p>
+        </div>
+        <div class="flex items-start mb-4">
+            <p class="mr-4">Middle Name:</p>
+            <p class="font-bold text-blue-900">@Orphan.MiddleName</p>
+        </div>
+        <div class="flex items-start mb-4">
+            <p class="mr-4">Last Name:</p>
+            <p class="font-bold text-blue-900">@Orphan.LastName</p>
+        </div>
+        <div class="flex items-start mb-4">
+            <p class="mr-4">Gender:</p>
+            <p class="font-bold text-blue-900">@Orphan.Gender</p>
+        </div>
+        <div class="flex items-start mb-4">
+            <p class="mr-4">DOB:</p>
+            <p class="font-bold text-blue-900">@Orphan.DateOfBirth?.ToString("MM/dd/yyyy")</p>
+        </div>
+        <div class="flex items-start mb-4">
+            <p class="mr-4">Status:</p>
+            <p class="font-bold text-blue-900">@Orphan.LCMStatus</p>
+        </div>
+        <div class="flex items-start mb-4">
+            <p class="mr-4">Profile Number:</p>
+            <p class="font-bold text-blue-900">@Orphan.ProfileNumber</p>
+        </div>
+
+    </div>
+</div>

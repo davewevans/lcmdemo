@@ -1,0 +1,114 @@
+﻿
+@inject IOrphanRepository OrphanRepository
+
+@if (gotData)
+{
+    <SfGrid TValue="Orphan"
+            AllowPaging="true" 
+            AllowSelection="true">  
+    
+        <GridPageSettings 
+            PageSize="20" 
+            PageSizes="new int[]{ 5, 10, 20, 50, 100 }">
+        </GridPageSettings>
+
+        <GridSelectionSettings EnableToggle="true" EnableSimpleMultiRowSelection="false"></GridSelectionSettings>
+
+        <GridEvents TValue="Orphan"></GridEvents>
+
+        <SfDataManager AdaptorInstance="@typeof(CustomAdaptor)" Adaptor="Adaptors.CustomAdaptor"></SfDataManager>
+
+
+        <GridColumns>
+            <GridColumn Field="@nameof(Orphan.OrphanID)" IsPrimaryKey="true" AllowEditing="false" Visible="false" />
+            <GridColumn Width="50" AllowEditing="false"> 
+                <Template> 
+                    @{ 
+                        var _orphan = (context as Orphan);   
+                        <div class="flex-shrink-0 h-12 w-12">
+                            <img src="@_orphan?.ProfilePicUrl" 
+                                 class="h-12 w-12 rounded-full" 
+                                 alt="@_orphan?.FullName" />
+                        </div>
+                    } 
+                </Template> 
+            </GridColumn> 
+
+            <GridColumn Field="@nameof(Orphan.FirstName)" 
+                        HeaderText="First Name" 
+                        Width="80"
+                        ValidationRules="@(new ValidationRules{ Required=true, MaxLength=255 })" />
+
+        </GridColumns>
+    </SfGrid>
+
+}
+
+
+
+
+@code {
+    
+    public static IOrphanRepository OrphanRepo { get; set; }
+    
+    public static List<Orphan> Orphans { get; set; }
+
+    private bool gotData = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        OrphanRepo = OrphanRepository;
+        Orphans = await OrphanRepository.GetAllOrphansAsync(includeToken:true);
+        if (Orphans != null) gotData = true;
+    }
+
+    public class CustomAdaptor : DataAdaptor
+    {
+       // Performs data Read operation
+        public override object Read(DataManagerRequest dm, string key = null)
+        {
+            if (Orphans == null)
+            {
+                // Orphans = await OrphanRepo.GetAllOrphansAsync();
+                
+                Console.WriteLine("Orphans is null");
+            }
+            
+            IEnumerable<Orphan> DataSource = Orphans;
+           
+            int count = DataSource.Cast<Orphan>().Count();
+
+
+            Console.WriteLine($"count: {count}");
+            Console.WriteLine($"Orphans count: {Orphans.Count()}");
+            Console.WriteLine($"dm.Skip: {dm.Skip}");
+            Console.WriteLine($"dm.Take: {dm.Take}");
+            var dataSourceList = DataSource.ToList();
+            foreach (var dOrphan in dataSourceList)
+            {
+                Console.WriteLine($"orphan: {dOrphan.FullName}");
+            }
+            Console.WriteLine($"dm.ReuireCounts: {dm.RequiresCounts}");
+
+            // foreach (var k in dm.Params.Keys)
+            // {
+            //     Console.WriteLine($"{k}: {dm.Params[k]}");
+            // }
+            
+            
+            if (dm.Skip != 0)
+            {
+            //Paging
+                DataSource = DataOperations.PerformSkip(DataSource, dm.Skip);
+            }
+            if (dm.Take != 0)
+            {
+                DataSource = DataOperations.PerformTake(DataSource, dm.Take);
+            }
+            return dm.RequiresCounts ? new DataResult() { Result = DataSource, Count = count } : (object)DataSource;
+        }
+    }
+
+
+}
+

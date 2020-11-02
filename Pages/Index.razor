@@ -1,0 +1,40 @@
+﻿@page "/"
+@page "/index"
+@page "/home"
+@page "/dashboard"
+@attribute [Authorize]
+
+@inject IDashboardRepository DashboardRepository
+
+<div class="bg-blue-200 bg-opacity-25 p-8">
+    <div class="md:flex justify-center">
+                <div class="mr-6">
+                    <img class="" src="images/LMCSMS_Icon_88x88_transparent.png" alt="Life for Children Ministry" />
+                </div>
+                <div class="text-center">
+                    <h1 class="text-5xl text-blue-900">Life For Children Ministry</h1>
+                    <span class="text-capitalize text-3xl">Social Management System</span>
+                </div>
+            </div>
+</div>
+
+<div>
+    <TotalCountsComponent />
+</div>
+
+
+  <div class="md:flex p-2 space-x-24 ml-20 mr-20 items-center">
+      <div class="w-1/2 p-2 text-center">
+           <OrphanStatisticsComponent /> 
+      </div>
+      <div class="w-1/2 p-2 text-center">
+          <NarrationStatisticsComponent /> 
+      </div>
+  </div>
+
+
+
+@code {
+ 
+    
+}

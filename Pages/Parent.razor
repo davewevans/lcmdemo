@@ -1,0 +1,17 @@
+﻿@page "/parent"
+
+<h3>Parent</h3>
+
+<h2>@message</h2>
+
+<Child SendParentMessage="HandleCallbackFromChild" />
+
+@code {
+
+    string message = "This message is from the parent component.";
+    
+    private void HandleCallbackFromChild(string msg)
+    {
+        message = msg;
+    }
+}

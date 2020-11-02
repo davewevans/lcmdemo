@@ -1,0 +1,118 @@
+﻿@if (Orphan != null)
+{                                  
+    <div class="md:flex w-auto ml-8 mr-8 mb-32">
+        <div class="w-1/2">
+            <!--profile pic edit -->
+            <div class="mb-6">
+                 <OrphanProfilePhoto Orphan="@Orphan" />
+            </div>
+            <div>
+                <OrphanPhotoUpload Orphan="@Orphan" IsProfilePhoto="true" HandlePostUpload="@HandleProfileChanged" />
+            </div>
+            
+        
+        </div>
+        <div class="w-1/2">
+            <EditForm Model="Orphan" OnValidSubmit="HandleValidSubmit" class="w-full max-w-lg">
+
+                <DataAnnotationsValidator/>
+
+                <!-- First Name -->
+                <div class="w-full px-3 mb-6">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="firstName">
+                        First Name
+                    </label>
+                    <InputText id="firstName" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="Orphan.FirstName"/>
+                    <ValidationMessage For="@(() => Orphan.FirstName)"/>
+                </div>
+
+                <!-- Middle Name -->
+                <div class="w-full px-3 mb-6">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="middleName">
+                        Middle Name
+                    </label>
+                    <InputText id="middleName" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="Orphan.MiddleName"/>
+                    <ValidationMessage For="@(() => Orphan.MiddleName)"/>
+                </div>
+
+                <!-- Last Name -->
+                <div class="w-full px-3 mb-6">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="lastName">
+                        Last Name
+                    </label>
+                    <InputText id="lastName" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="Orphan.LastName"/>
+                    <ValidationMessage For="@(() => Orphan.LastName)"/>
+                </div>
+
+                <div class="flex flex-wrap mb-6">
+                    <!-- Gender -->
+                    <div class="w-full md:w-48 px-3 mb-6 md:mb-0 mr-8">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="gender">
+                            Gender
+                        </label>
+                        <div class="relative">
+                            <InputSelect id="gender" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="Orphan.Gender">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </InputSelect>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                </svg>
+                            </div>
+                            <ValidationMessage For="@(() => Orphan.Gender)"/>
+                        </div>
+                    </div>
+
+                    <!-- LCM Status -->
+                    <div class="w-full md:w-48 px-3 mb-6 md:mb-0">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="lcmStatus">
+                            Status
+                        </label>
+                        <div class="relative">
+                            <InputSelect id="lcmStatus" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="Orphan.LCMStatus">
+                                <option value="Active">Active</option>
+                                <option value="Not Active">Not Active</option>
+                            </InputSelect>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                </svg>
+                            </div>
+                            <ValidationMessage For="@(() => Orphan.LCMStatus)"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap mb-6">
+                    <!-- DOB -->
+                    <div class="w-full md:w-48 px-3 mb-6 md:mb-0 mr-8">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="dateOfBirth">
+                            Date Of Birth
+                        </label>
+                        <InputDate id="dateOfBirth" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="Orphan.DateOfBirth"/>
+                        <ValidationMessage For="@(() => Orphan.DateOfBirth)"/>
+                    </div>
+
+                    <!-- Profile Number -->
+                    <div class="w-full md:w-48 px-3 mb-6 md:mb-0">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="profileNumber">
+                            Profile Number
+                        </label>
+                        <InputText id="profileNumber" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="Orphan.ProfileNumber"/>
+                        <ValidationMessage For="@(() => Orphan.ProfileNumber)"/>
+                    </div>
+                </div>
+                
+                <div class="flex px-3 w-full justify-center">
+                    <button class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded inline-flex items-center justify-center w-20" type="submit"><i class="fa fa-thumbs-up mr-2"></i> Save</button> 
+                </div>
+
+            </EditForm>
+        </div>
+    </div>
+}
+else
+{
+    <p>No record found.</p>
+}

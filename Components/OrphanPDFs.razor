@@ -1,0 +1,63 @@
+﻿<div class="m-10">
+    <div class="md:flex mt-4 mb-8 bg-blue-100 p-4 items-center justify-between">
+        <div class="flex items-center text-blue-600">
+            <i class="fa fa-picture text-yellow-600 font-bold text-2xl mr-3"></i>
+            <h3 class="text-2xl font-semibold mt-1">PDFs</h3>
+        </div>
+    </div>
+
+
+    <div>
+        <h3 class="text-3xl">
+            Add New PDF
+        </h3>
+        <div>
+            <p class="text-2xl">Select a Sponsor</p>
+        </div>
+        <div class="mt-4">
+            <SfDropDownList TItem="Sponsor" TValue="string"
+                            DataSource="@Orphan.Sponsors"
+                            @bind-Value="selectedValue"
+                            Placeholder="Select a Sponsor"
+                            Width="400px"
+                            PopupHeight="400px"
+                            PopupWidth="300px">
+                <DropDownListFieldSettings Text="FullName" Value="SponsorID"></DropDownListFieldSettings>
+            </SfDropDownList>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(selectedValue))
+        {
+            <div class="mt-4 mb-4">
+                <OrphanPDFUpload Orphan="@Orphan" SponsorID="@selectedValue" HandlePostUpload="@HandlePostUpload"/>
+            </div>
+        }
+
+
+    </div>
+
+
+    <div class="mt-8">
+        @{
+            if (Orphan?.PDFs != null)
+            {
+                foreach (var pdf in Orphan.PDFs)
+                {
+                    string picUrl = $"{pdf.BaseUrl}{pdf.FileName}";
+                    <div class="mb-2 text-lg font-weight-bold">
+                        <p>Sponsor: <span class="font-weight-bold">@pdf.Sponsor.FullName</span></p>
+                        <div class="flex">
+                            <button type="button" class="mr-4" @onclick="() => OnDeletePDF(pdf.DocumentID)">
+                                <i class="fa fa-trash text-xl text-red-700"></i>
+                            </button>
+                            <span class="underline text-blue-600 mr-6">
+                                <a href="@picUrl" target="_blank">@pdf.FileName</a>
+                            </span>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+
+</div>

@@ -1,0 +1,69 @@
+﻿@using LCMSMSPWA.Adaptors
+@using LCMSMSPWA.Pages
+
+
+<SfGrid TValue="Guardian"
+        AllowPaging="true"
+        AllowSorting="true"
+        AllowFiltering="true"
+        Toolbar="@ToolbarItems"
+        AllowSelection="true"
+        AllowReordering="true"
+        AllowResizing="true"
+        AllowTextWrap="true"
+        AllowExcelExport="true"
+        AllowPdfExport="true">
+
+    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>
+
+    <GridPageSettings
+        PageSize="20"
+        PageSizes="@PageSizes">
+    </GridPageSettings>
+
+    <GridSelectionSettings EnableToggle="true" EnableSimpleMultiRowSelection="false"></GridSelectionSettings>
+
+    <GridEvents TValue="Guardian"></GridEvents>
+
+    <SfDataManager Adaptor="Adaptors.CustomAdaptor">
+        <GuardianCustomAdapter></GuardianCustomAdapter>
+    </SfDataManager>
+
+    <GridEditSettings
+        AllowAdding="true"
+        AllowEditing="true"
+        AllowDeleting="true"
+        Mode="EditMode.Normal"
+        AllowEditOnDblClick="true"
+        ShowDeleteConfirmDialog="true">
+    </GridEditSettings>
+
+    <GridColumns>
+         <GridColumn Type="ColumnType.CheckBox" Width="30" AllowEditing="false" />
+        <GridColumn Field="@nameof(Guardian.GuardianID)" IsPrimaryKey="true" AllowEditing="false" Visible="false"/>
+
+        <GridColumn Field="@nameof(Guardian.FirstName)"
+                    HeaderText="First Name"
+                    Width="120"
+                    ValidationRules="@(new ValidationRules {Required = true, MaxLength = 255})"/>
+        <GridColumn Field="@nameof(Guardian.LastName)"
+                    HeaderText="Last Name"
+                    Width="120"
+                    ValidationRules="@(new ValidationRules {MaxLength = 255})"/>
+        <GridColumn Field="@nameof(Guardian.Location)"
+                    HeaderText="Location"
+                    Width="160"
+                    ValidationRules="@(new ValidationRules {MaxLength = 255})"/>
+
+    </GridColumns>
+</SfGrid>
+
+
+@code {
+
+    public List<Guardian> Guardians { get; set; }
+
+    public List<string> ToolbarItems = new List<string> {"Add", "Edit", "Delete", "Update", "Cancel", "Search"};
+    
+    public int[] PageSizes = {5, 10, 20, 50, 100};
+}

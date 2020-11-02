@@ -1,0 +1,139 @@
+﻿
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+
+<SfDialog Width="400px" @bind-Visible="@IsVisible" IsModal="true" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Header>
+            <h3 class="text-3xl font-semibold">Edit Academic Record</h3>
+        </Header>
+        <Content>
+            <div class="w-full m-6">
+                <EditForm Model="AcademicRecord" OnValidSubmit="HandleValidSubmit" class="w-full max-w-lg">
+                    <DataAnnotationsValidator/>
+
+                    <!-- Grade -->
+                    <div class="w-1/2 px-3 mb-6">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grade">
+                            Grade
+                        </label>
+                        <InputText id="grade" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="AcademicRecord.Grade"/>
+                        <ValidationMessage For="@(() => AcademicRecord.Grade)"/>
+                    </div>
+
+                    <!-- School -->
+                    <div class="w-3/4 px-3 mb-6">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="school">
+                            School
+                        </label>
+                        <InputText id="school" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="AcademicRecord.School"/>
+                        <ValidationMessage For="@(() => AcademicRecord.School)"/>
+                    </div>
+
+                    <!-- KCPE -->
+                    <div class="w-1/2 px-3 mb-6">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="KCPE">
+                            KCPE
+                        </label>
+                        <InputText id="KCPE" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="AcademicRecord.KCPE"/>
+                        <ValidationMessage For="@(() => AcademicRecord.KCPE)"/>
+                    </div>
+
+                    <!-- KCSE -->
+                    <div class="w-1/2 px-3 mb-6">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="KCSE">
+                            KCSE
+                        </label>
+                        <InputText id="KCSE" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="AcademicRecord.KCSE"/>
+                        <ValidationMessage For="@(() => AcademicRecord.KCSE)"/>
+                    </div>
+
+                </EditForm>
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton OnClick="@HandleValidSubmit">
+            <DialogButtonModel Content="Save" IsPrimary="true"></DialogButtonModel>
+        </DialogButton>
+        <DialogButton OnClick="@OnCancelBtnClick">
+            <DialogButtonModel Content="Cancel"></DialogButtonModel>
+        </DialogButton>
+    </DialogButtons>
+</SfDialog>
+
+
+<style>
+    .e-btn.e-flat.e-primary, .e-btn.e-flat.e-primary:focus {
+        background-color: #317ab9;
+        border-color: #265f91;
+        color: #fff;
+    }
+
+    .e-btn.e-flat.e-primary:hover, .e-btn.e-flat.e-primary:active {
+        background-color: #21527d;
+        border-color: #163854;
+        color: #fff;
+    }
+</style>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        Console.WriteLine($"IsVisible: {IsVisible}");
+    }
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public AcademicEdit AcademicRecord { get; set; } 
+    
+    [Parameter]
+    public int AcademicId { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool> OnEditComplete { get; set; }
+
+    [Inject]
+    public IAcademicRepository AcademicRepository { get; set; }
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
+    [Inject]
+    protected IMatToaster Toaster { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Focus the element
+            await JSRuntime.FocusInput("grade");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (AcademicRecord == null)
+        {
+            Toaster.Add($" No Academic record found.", MatToastType.Danger);
+            return;
+        }
+
+        await AcademicRepository.UpdateAcademicAsync(AcademicId, AcademicRecord);
+        IsVisible = false;
+        await OnEditComplete.InvokeAsync(true);
+        StateHasChanged();
+        Toaster.Add($" Record updated successfully!", MatToastType.Success);
+    }
+
+    private async Task OnCancelBtnClick()
+    {
+        IsVisible = false;
+        await OnEditComplete.InvokeAsync(false);
+    }
+
+}

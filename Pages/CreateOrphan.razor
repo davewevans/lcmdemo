@@ -1,0 +1,90 @@
+﻿@page "/CreateOrphan"
+@attribute [Authorize]
+
+<h3>Add New Orphan</h3>
+
+@if (NewOrphan != null)
+{
+<RadzenCard>
+    <EditForm Model="NewOrphan" OnValidSubmit="HandleValidSubmit" class="card card-body bg-light mt-5">
+        <DataAnnotationsValidator />
+        <div class="form-group row">
+            <label for="FirstName" class="col-md-3 col-form-label">First Name:</label>
+            <div class="col-md-9">
+                <InputText id="firstName" class="form-control" @bind-Value="NewOrphan.FirstName" />
+                <ValidationMessage For="@(() => NewOrphan.FirstName)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="MiddleName" class="col-md-3 col-form-label">Middle Name:</label>
+            <div class="col-md-9">
+                <InputText id="middleName" class="form-control" @bind-Value="NewOrphan.MiddleName" />
+                <ValidationMessage For="@(() => NewOrphan.MiddleName)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="LastName" class="col-md-3 col-form-label">Last Name:</label>
+            <div class="col-md-9">
+                <InputText id="lastName" class="form-control" @bind-Value="NewOrphan.LastName" />
+                <ValidationMessage For="@(() => NewOrphan.LastName)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="DateOfBirth" class="col-md-3 col-form-label">Date of Birth:</label>
+            <div class="col-md-9">
+
+                <MatDatePicker @bind-Value="NewOrphan.DateOfBirth"></MatDatePicker>
+                
+                @*<InputDate id="DateOfBirth" class="form-control" @bind-Value="NewOrphan.DateOfBirth" />*@
+                <ValidationMessage For="@(() => NewOrphan.DateOfBirth)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="Gender" class="col-md-3 col-form-label">Gender:</label>
+            <div class="col-md-9">
+                <InputSelect id="gender" class="form-control" @bind-Value="NewOrphan.Gender">
+                    @*<option value="">Select Gender</option>*@
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => NewOrphan.Gender)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="LCMStatus" class="col-md-3 col-form-label">LCM Status:</label>
+            <div class="col-md-9">
+                <InputSelect id="lcmStatus" class="form-control" @bind-Value="NewOrphan.LCMStatus">
+                    @*<option value="">Select LCM Status</option>*@
+                    <option value="Active">Active</option>
+                    <option value="Not Active">Not Active</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => NewOrphan.LCMStatus)" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="ProfileNumber" class="col-md-3 col-form-label">Profile Number:</label>
+            <div class="col-md-9">
+                <InputText id="profileNumber" class="form-control" @bind-Value="NewOrphan.ProfileNumber" />
+                <ValidationMessage For="@(() => NewOrphan.ProfileNumber)" />
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <button class="btn btn-lg btn-success" type="submit"><i class="oi oi-thumb-up"></i> Save</button>
+            </div>
+        </div>
+    </EditForm>
+</RadzenCard>
+        }
+
+
+
+

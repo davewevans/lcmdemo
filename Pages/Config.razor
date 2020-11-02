@@ -1,0 +1,7 @@
+﻿@page "/config"
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+<h1>Configuration example</h1>
+
+<p>Message: @Configuration["apiUrl"]</p>

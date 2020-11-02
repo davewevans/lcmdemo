@@ -1,0 +1,122 @@
+﻿@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+
+<SfDialog Width="400px" @bind-Visible="@IsVisible" IsModal="true" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Header>
+            <h3 class="text-3xl font-semibold">Add New Narration Record</h3>
+        </Header>
+        <Content>
+            <div class="w-full m-6 text-gray-600 text-xl">
+                New narration record for <br>@Orphan.FullName
+            </div>
+            <div class="w-full m-6">
+                <EditForm Model="narrationCreation" OnValidSubmit="HandleValidSubmit" class="w-full max-w-lg">
+                    <DataAnnotationsValidator/>
+
+                    <!-- Subject -->
+                    <div class="w-11/12 px-3 mb-6">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="subject">
+                            Subject
+                        </label>
+                        <InputText id="subject" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="narrationCreation.Subject"/>
+                        <ValidationMessage For="@(() => narrationCreation.Subject)"/>
+                    </div>
+
+                    <!-- Note -->
+                    <div style="height:400px;">
+                        <div class="w-11/12 h-full px-3 mb-6">
+                            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="note">
+                                Note
+                            </label>
+                            <InputTextArea id="note" class="appearance-none block w-full h-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" @bind-Value="narrationCreation.Note"/>
+                            <ValidationMessage For="@(() => narrationCreation.Note)"/>
+                        </div>
+                    </div>
+
+
+                </EditForm>
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton OnClick="@HandleValidSubmit">
+            <DialogButtonModel Content="Save" IsPrimary="true"></DialogButtonModel>
+        </DialogButton>
+        <DialogButton OnClick="@OnCancelBtnClick">
+            <DialogButtonModel Content="Cancel"></DialogButtonModel>
+        </DialogButton>
+    </DialogButtons>
+</SfDialog>
+
+
+<style>
+    .e-btn.e-flat.e-primary, .e-btn.e-flat.e-primary:focus {
+        background-color: #317ab9;
+        border-color: #265f91;
+        color: #fff;
+    }
+
+    .e-btn.e-flat.e-primary:hover, .e-btn.e-flat.e-primary:active {
+        background-color: #21527d;
+        border-color: #163854;
+        color: #fff;
+    }
+</style>
+
+@code {
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public OrphanDetailsModel Orphan { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnAddNewComplete { get; set; }
+
+    [Inject]
+    public INarrationRepository NarrationRepository { get; set; }
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
+    private NarrationCreation narrationCreation = new NarrationCreation();
+
+    [Inject]
+    protected IMatToaster Toaster { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+    // Focus the element
+            await JSRuntime.FocusInput("subject");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Orphan == null)
+        {
+            Toaster.Add($" No Orphan record found.", MatToastType.Danger);
+            return;
+        }
+        narrationCreation.OrphanID = Orphan.OrphanID;
+        narrationCreation.EntryDate = DateTime.Now;
+
+        await NarrationRepository.AddNarrationAsync(narrationCreation);
+        IsVisible = false;
+        await OnAddNewComplete.InvokeAsync(true);
+        StateHasChanged();
+        Toaster.Add($" Narration record added.", MatToastType.Success);
+    }
+
+    private async Task OnCancelBtnClick()
+    {
+        IsVisible = false;
+        await OnAddNewComplete.InvokeAsync(false);
+    }
+
+}

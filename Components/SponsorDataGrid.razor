@@ -1,0 +1,91 @@
+﻿@using LCMSMSPWA.Adaptors
+@using LCMSMSPWA.Pages
+
+<SfGrid TValue="Sponsor"
+        AllowPaging="true"
+        AllowSorting="true"
+        AllowFiltering="true"
+        Toolbar="@ToolbarItems"
+        AllowSelection="true"
+        AllowReordering="true"
+        AllowResizing="true"
+        AllowTextWrap="true"
+        AllowExcelExport="true"
+        AllowPdfExport="true">
+
+    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>
+
+    <GridPageSettings
+        PageSize="20"
+        PageSizes="@PageSizes">
+    </GridPageSettings>
+
+    <GridSelectionSettings EnableToggle="true" EnableSimpleMultiRowSelection="false"></GridSelectionSettings>
+
+    <GridEvents TValue="Sponsor"></GridEvents>
+
+    <SfDataManager Adaptor="Adaptors.CustomAdaptor">
+        <SponsorCustomAdapter></SponsorCustomAdapter>
+    </SfDataManager>
+
+    <GridEditSettings
+        AllowAdding="true"
+        AllowEditing="true"
+        AllowDeleting="true"
+        Mode="EditMode.Normal"
+        AllowEditOnDblClick="true"
+        ShowDeleteConfirmDialog="true">
+    </GridEditSettings>
+
+    <GridColumns>
+        <GridColumn Field="@nameof(Sponsor.SponsorID)" IsPrimaryKey="true" AllowEditing="false" Visible="false"/>
+
+        <GridColumn Field="@nameof(Sponsor.FirstName)"
+                    HeaderText="First Name"
+                    Width="80"
+                    ValidationRules="@(new ValidationRules {Required = true, MaxLength = 255})"/>
+        <GridColumn Field="@nameof(Sponsor.LastName)"
+                    HeaderText="Last Name"
+                    Width="80"
+                    ValidationRules="@(new ValidationRules {MaxLength = 255})"/>
+        <GridColumn Field="@nameof(Sponsor.Address)"
+                    HeaderText="Address"
+                    Width="80"
+                    HideAtMedia="(min-width: 480px)"
+                    ValidationRules="@(new ValidationRules {MaxLength = 255})"/>
+        <GridColumn Field="@nameof(Sponsor.City)"
+                    HeaderText="City"
+                    Width="80"
+                    HideAtMedia="(min-width: 480px)"
+                    ValidationRules="@(new ValidationRules {MaxLength = 255})"/>
+        <GridColumn Field="@nameof(Sponsor.State)"
+                    HeaderText="State"
+                    Width="50"
+                    HideAtMedia="(min-width: 480px)"
+                    ValidationRules="@(new ValidationRules {MaxLength = 64})"/>
+        <GridColumn Field="@nameof(Sponsor.ZipCode)"
+                    HeaderText="Zip Code"
+                    Width="40"
+                    HideAtMedia="(min-width: 480px)"
+                    ValidationRules="@(new ValidationRules {MaxLength = 255})"/>
+        <GridColumn Field="@nameof(Sponsor.Email)"
+                    HeaderText="Email"
+                    Width="80"
+                    ValidationRules="@(new ValidationRules {MaxLength = 255})"/>
+        <GridColumn Field="@nameof(Sponsor.MainPhone)"
+                    HeaderText="Phone"
+                    Width="80"
+                    ValidationRules="@(new ValidationRules {MaxLength = 255})"/>
+
+    </GridColumns>
+</SfGrid>
+
+
+@code {
+
+    public List<Sponsor> Sponsors { get; set; }
+
+    public List<string> ToolbarItems = new List<string> {"Add", "Edit", "Delete", "Update", "Cancel", "Search"};
+    
+    public int[] PageSizes = {5, 10, 20, 50, 100};
+}

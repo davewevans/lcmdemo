@@ -1,0 +1,147 @@
+@using Microsoft.AspNetCore.Components
+@using System.Collections.Generic
+@using System.Linq
+@using System.Threading.Tasks
+
+@inherits DataAdaptor<IOrphanRepository>
+
+<CascadingValue Value="@this">
+    @ChildContent
+</CascadingValue>
+
+
+@code {
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public List<Orphan> Orphans { get; set; }
+
+    bool gridInitialized = false;
+
+    public override async Task<object> ReadAsync(DataManagerRequest dm, string key = null)
+    {
+        if (!gridInitialized)
+        {
+            // Get data from API
+            Orphans = await Service.GetAllOrphansAsync();
+            gridInitialized = true;
+        }
+
+    // Must wait for async operations to finish or grid will not get data.
+        await Task.Yield();
+        IEnumerable<Orphan> dataSource = Orphans;
+
+        if (dm.Search != null && dm.Search.Count > 0)
+        {
+    // Searching
+            dataSource = DataOperations.PerformSearching(dataSource, dm.Search);
+        }
+        if (dm.Sorted != null && dm.Sorted.Count > 0)
+        {
+    // Sorting
+            dataSource = DataOperations.PerformSorting(dataSource, dm.Sorted);
+        }
+        if (dm.Where != null && dm.Where.Count > 0)
+        {
+    // Filtering
+            dataSource = DataOperations.PerformFiltering(dataSource, dm.Where, dm.Where[0].Operator);
+        }
+
+        int count = dataSource.Cast<Orphan>().Count();
+
+        if (dm.Skip != 0)
+        {
+            dataSource = dataSource.Skip(dm.Skip); //Paging
+        }
+
+        if (dm.Take != 0)
+        {
+            dataSource = dataSource.Take(dm.Take);
+        }
+
+    // Console.WriteLine($"count: {count}");
+    // Console.WriteLine($"Orphans count: {Orphans.Count()}");
+    // Console.WriteLine($"dm.Skip: {dm.Skip}");
+    // Console.WriteLine($"dm.Take: {dm.Take}");
+    // var dataSourceList = dataSource.ToList();
+    // foreach (var dOrphan in dataSourceList)
+    // {
+    //     Console.WriteLine($"orphan: {dOrphan.FullName}");
+    // }
+    // Console.WriteLine($"dm.ReuireCounts: {dm.RequiresCounts}");
+
+        return dm.RequiresCounts ? new DataResult() {Result = dataSource, Count = count} : (object) dataSource;
+    }
+
+    public override async Task<object> InsertAsync(DataManager dm, object value, string key)
+    {
+        var orphan = value as Orphan;
+        if (orphan == null) return value;
+
+        var newOrphan = new OrphanCreation
+        {
+            FirstName = orphan?.FirstName,
+            MiddleName = orphan?.MiddleName,
+            LastName = orphan?.LastName,
+            Gender = orphan?.Gender,
+            DateOfBirth = orphan?.DateOfBirth,
+            LCMStatus = orphan?.LCMStatus,
+            ProfileNumber = orphan?.ProfileNumber
+        };
+        await Service.AddOrphanAsync(newOrphan);
+        Orphans?.Insert(0, orphan);
+        return value;
+    }
+
+    public override async Task<object> UpdateAsync(DataManager dm, object value, string keyField, string key)
+    {
+        var orphan = (value as Orphan);
+        if (orphan == null) return value;
+        var orphanUpdate = new OrphanEdit
+        {
+            FirstName = orphan?.FirstName,
+            MiddleName = orphan?.MiddleName,
+            LastName = orphan?.LastName,
+            Gender = orphan?.Gender,
+            DateOfBirth = orphan?.DateOfBirth,
+            LCMStatus = orphan?.LCMStatus,
+            ProfileNumber = orphan?.ProfileNumber,
+            EntryDate = orphan?.EntryDate ?? DateTime.Now,
+            ProfilePictureID = orphan?.ProfilePictureID,
+            GuardianID = orphan?.GuardianID
+        };
+
+        // So the record in the grid will immediately update
+        var orphanFromCache = Orphans.FirstOrDefault(o => o.OrphanID == orphan.OrphanID);
+        if (orphanFromCache != null)
+        {
+            orphanFromCache.FirstName = orphanUpdate?.FirstName;
+            orphanFromCache.MiddleName = orphanUpdate?.MiddleName;
+            orphanFromCache.LastName = orphanUpdate?.LastName;
+            orphanFromCache.Gender = orphanUpdate?.Gender;
+            orphanFromCache.DateOfBirth = orphanUpdate?.DateOfBirth;
+            orphanFromCache.LCMStatus = orphanUpdate?.LCMStatus;
+            orphanFromCache.ProfileNumber = orphanUpdate?.ProfileNumber;
+            orphanFromCache.EntryDate = orphanUpdate?.EntryDate ?? DateTime.Now;
+            orphanFromCache.ProfilePictureID = orphanUpdate?.ProfilePictureID;
+            orphanFromCache.GuardianID = orphanUpdate?.GuardianID;
+        }
+        
+        await Service.UpdateOrphanAsync(orphan.OrphanID, orphanUpdate);
+        return value;
+    }
+
+    public override async Task<object> RemoveAsync(DataManager dm, object value, string keyField, string key)
+    {
+        int orphanId;
+        if (int.TryParse(value.ToString(), out orphanId))
+        {
+            await Service.DeleteOrphanAsync(orphanId);
+            var orphanToDelete = Orphans.FirstOrDefault(x => x.OrphanID == orphanId);
+            Orphans.Remove(orphanToDelete);
+        }
+        return value;
+    }
+
+}

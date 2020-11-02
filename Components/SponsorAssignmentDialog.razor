@@ -1,0 +1,171 @@
+﻿@using Syncfusion.Blazor.Popups
+
+<SfDialog Width="500px" @bind-Visible="@IsVisible" IsModal="true" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Header>
+            <h3 class="text-3xl font-semibold">Assign Sponsor to Orphan</h3>
+        </Header>
+        <Content>
+            <div class="w-full m-6 text-gray-600 text-xl">
+                Assign Sponsor to <br>@Orphan.FullName
+            </div>
+            <div class="w-11/12 m-6 mr-6">
+                @if (gotData)
+                {
+                    <SfAutoComplete
+                        @ref="autoCompleteObj"
+                        TValue="string"
+                        TItem="Sponsor"
+                        @bind-Value="selectedSponsor"
+                        Placeholder="Select Sponsor"
+                        DataSource="@sponsors"
+                        PopupHeight="400px"
+                        PopupWidth="400px">
+                        
+                        @* <AutoCompleteEvents TValue="string" ValueChange="OnChange"></AutoCompleteEvents>  *@
+                        <AutoCompleteTemplates TItem="Sponsor">
+                            <ItemTemplate>
+                                <div class="flex font-semibold mb-1">
+                                    <p>@((context as Sponsor).FirstName)</p>
+                                    <p>@((context as Sponsor).LastName)</p>
+                                </div>
+                                <div class="m-b1">
+                                    <p>@((context as Sponsor).Email)</p>
+                                    <p>@((context as Sponsor).MainPhone)</p>
+                                </div>
+                                <div class="">
+                                    <p>@((context as Sponsor).Address)</p>
+                                </div>
+                                <div class="flex">
+                                    <p>@((context as Sponsor).City),</p>
+                                    <p>@((context as Sponsor).State)</p>
+                                    <p>@((context as Sponsor).ZipCode)</p>
+                                </div>
+                                <div class="border-b-2 border-blue-900 mb-2">
+
+                                </div>
+
+                            </ItemTemplate>
+                        </AutoCompleteTemplates>
+                        <AutoCompleteFieldSettings
+                            Value="FullName">
+                        </AutoCompleteFieldSettings>
+                    </SfAutoComplete>
+
+                }
+                else
+                {
+                    <div class="text-center h-40">
+                        <LoadingComponent/>
+                    </div>
+                }
+
+
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton OnClick="@HandleValidSubmit">
+            <DialogButtonModel Content="Save" IsPrimary="true"></DialogButtonModel>
+        </DialogButton>
+        <DialogButton OnClick="@OnCancelBtnClick">
+            <DialogButtonModel Content="Cancel"></DialogButtonModel>
+        </DialogButton>
+    </DialogButtons>
+</SfDialog>
+
+<style>
+    .e-btn.e-flat.e-primary, .e-btn.e-flat.e-primary:focus {
+        background-color: #317ab9;
+        border-color: #265f91;
+        color: #fff;
+    }
+
+    .e-btn.e-flat.e-primary:hover, .e-btn.e-flat.e-primary:active {
+        background-color: #21527d;
+        border-color: #163854;
+        color: #fff;
+    }
+</style>
+
+@code {
+    
+    public SfAutoComplete<string, Sponsor> autoCompleteObj; 
+    
+    private bool gotData = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        sponsors = await SponsorRepository.GetSponsorsAsync();
+
+        if (sponsors != null)
+        {
+            foreach (var sponsor in sponsors)
+            {
+                sponsor.FullName = $"{sponsor.FirstName} {sponsor.LastName} ({sponsor.Email})";
+            }
+        }
+
+        gotData = sponsors != null && sponsors.Any();
+    }
+
+    private List<Sponsor> sponsors;
+    
+    private string selectedSponsor;
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public OrphanDetailsModel Orphan { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnAddNewComplete { get; set; }
+
+    [Inject]
+    public ISponsorRepository SponsorRepository { get; set; }
+
+    [Inject]
+    public IOrphanSponsorRepository OrphanSponsorRepository { get; set; }
+
+    [Inject]
+    public IOrphanRepository OrphanRepository { get; set; }
+
+
+    [Inject]
+    protected IMatToaster Toaster { get; set; }
+
+
+    private async Task HandleValidSubmit()
+    {
+        if (Orphan == null)
+        {
+            Toaster.Add($" No Sponsor record found.", MatToastType.Danger);
+            return;
+        }
+
+        var sponsor = sponsors.FirstOrDefault(s => s.FullName == selectedSponsor);
+
+        if (sponsor != null)
+        {
+            var orphanSponsor = new OrphanSponsor
+            {
+                OrphanID = Orphan.OrphanID,
+                SponsorID = sponsor.SponsorID
+            };
+            await OrphanSponsorRepository.AddAssignment(orphanSponsor);
+            IsVisible = false;
+            await OnAddNewComplete.InvokeAsync(true);
+            StateHasChanged();
+            Toaster.Add($" Successful assignment.", MatToastType.Success);
+        }
+
+    }
+
+    private async Task OnCancelBtnClick()
+    {
+        IsVisible = false;
+        await OnAddNewComplete.InvokeAsync(false);
+    }
+
+}

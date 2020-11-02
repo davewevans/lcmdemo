@@ -1,0 +1,105 @@
+﻿@using Syncfusion.Blazor.Charts
+@using LegendPosition = Syncfusion.Blazor.Charts.LegendPosition
+@using LabelPosition = Syncfusion.Blazor.Charts.LabelPosition
+@inject NavigationManager NavigationManager
+@inject IDashboardRepository DashboardRepository
+
+
+<div class="control-section">
+    <SfChart Title="Narration Statistics">
+        <ChartEvents Load="ChartLoad"/>
+        <ChartArea><ChartAreaBorder Width="0"></ChartAreaBorder></ChartArea>
+        <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category" Title="Narrations">
+            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+        </ChartPrimaryXAxis>
+        <ChartPrimaryYAxis LabelFormat="{value}" EdgeLabelPlacement="EdgeLabelPlacement.Shift">
+            <ChartAxisLineStyle Width="0"></ChartAxisLineStyle>
+            <ChartAxisLabelStyle Color="transparent"></ChartAxisLabelStyle>
+            <ChartAxisMajorTickLines Width="0"></ChartAxisMajorTickLines>
+            <ChartAxisMajorGridLines Width="0"></ChartAxisMajorGridLines>
+        </ChartPrimaryYAxis>
+        <ChartTooltipSettings Enable="true"></ChartTooltipSettings>
+        <ChartSeriesCollection>
+            <ChartSeries DataSource="@BarData" XName="x" YName="y" Name="Total" Width="2" Type="ChartSeriesType.Bar">
+                <ChartMarker>
+                    <ChartDataLabel Visible="true" Position="LabelPosition.Bottom"></ChartDataLabel>
+                </ChartMarker>
+            </ChartSeries>
+            <ChartSeries DataSource="@BarData" XName="x" YName="y1" Name="Last 6 Months" Width="2" Type="ChartSeriesType.Bar">
+                <ChartMarker>
+                    <ChartDataLabel Visible="true" Position="LabelPosition.Bottom"></ChartDataLabel>
+                </ChartMarker>
+            </ChartSeries>
+        </ChartSeriesCollection>
+    </SfChart>
+</div>
+
+
+<div hidden="@hideLoadingAnimation">
+    <LoadingComponent />
+</div>
+
+
+
+
+@code {
+    
+    NarrationStatistics narrationStatistics = null;
+    bool hideLoadingAnimation = false;
+    bool hideChart = true;
+    
+    public List<BarChartData> BarData { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        narrationStatistics = await DashboardRepository.GetNarrationStatistics();
+        
+        BarData =  new List<BarChartData>
+        {
+            new BarChartData { x= "Orphans",  y= (double)narrationStatistics.OrphanNarrationCount , y1= (double)narrationStatistics.OrphanLast6MoCount },
+            new BarChartData { x= "Guardians", y= (double)narrationStatistics.GuardianNarrationCount , y1= (double)narrationStatistics.GuardianLast6MoCount },
+            //
+            // TODO remove hardcode values. For demo only
+            //
+            //new BarChartData { x= "Orphans",  y= 421 , y1= 206 },
+           //new BarChartData { x= "Guardians", y= 230 , y1= 85 },
+        };
+
+    }
+    
+    public class BarChartData
+    {
+        public string x { get; set; }
+        public double y { get; set; }
+        public double y1 { get; set; }
+    }
+  
+    string CurrentUri;
+    void ChartLoad(ILoadedEventArgs Args)
+    {
+        CurrentUri = NavigationManager.Uri;
+        if (CurrentUri.IndexOf("material") > -1)
+        {
+            Args.Theme = ChartTheme.Material;
+        }
+        else if (CurrentUri.IndexOf("fabric") > -1)
+        {
+            Args.Theme = ChartTheme.Fabric;
+        }
+        else if (CurrentUri.IndexOf("bootstrap") > -1)
+        {
+            Args.Theme = ChartTheme.Bootstrap;
+        }
+        else if (CurrentUri.IndexOf("highcontrast") > -1)
+        {
+            Args.Theme = ChartTheme.HighContrast;
+        }
+        else
+        {
+            Args.Theme = ChartTheme.Bootstrap4;
+        }
+        
+        hideChart = false;
+        hideLoadingAnimation = true;
+    }
+}

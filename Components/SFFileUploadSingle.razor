@@ -1,0 +1,45 @@
+﻿
+@page "/sffileuploadsingle"
+
+<h3>SFFileUploadSingle</h3>
+
+@using Syncfusion.Blazor.Inputs
+
+<div ID="DropArea">
+    Drop files here to upload
+</div>
+
+<SfUploader ID="UploadFile" AutoUpload=false DropArea="#DropArea">
+    <UploaderAsyncSettings SaveUrl="api/SampleData/Save" RemoveUrl="api/SampleData/Remove"></UploaderAsyncSettings>
+</SfUploader>
+
+<style>
+#DropArea {
+    padding: 50px 25px;
+    margin: 30px auto;
+    border: 1px solid #c3c3c3;
+    text-align: center;
+    width: 20%;
+    display: inline-flex;
+}
+
+.e-file-select,
+.e-file-drop {
+    display: none;
+}
+
+body .e-upload-drag-hover {
+    outline: 2px dashed brown;
+}
+
+#uploadfile {
+    width: 60%;
+    display: inline-flex;
+    margin-left: 5%;
+}
+</style>
+
+
+@code {
+    
+}

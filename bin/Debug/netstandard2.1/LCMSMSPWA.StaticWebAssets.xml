@@ -1,0 +1,9 @@
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="/" Path="C:\Users\davew\OneDrive\Documents\GitHub\LCMSMSPWA\bin\Debug\netstandard2.1\wwwroot\" />
+  <ContentRoot BasePath="_content/BlazorInputFile" Path="C:\Users\davew\.nuget\packages\blazorinputfile\0.2.0\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/MatBlazor" Path="C:\Users\davew\.nuget\packages\matblazor\2.6.2\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication" Path="C:\Users\davew\.nuget\packages\microsoft.aspnetcore.components.webassembly.authentication\3.2.1\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Radzen.Blazor" Path="C:\Users\davew\.nuget\packages\radzen.blazor\2.11.7\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Syncfusion.Blazor" Path="C:\Users\davew\.nuget\packages\syncfusion.blazor\18.2.0.47\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Tewr.Blazor.FileReader" Path="C:\Users\davew\.nuget\packages\tewr.blazor.filereader\2.0.0.20200\build\..\staticwebassets\" />
+</StaticWebAssets>

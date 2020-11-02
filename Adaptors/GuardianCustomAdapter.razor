@@ -1,0 +1,117 @@
+﻿@using Microsoft.AspNetCore.Components
+@using System.Collections.Generic
+@using System.Linq
+@using System.Threading.Tasks
+
+@inherits DataAdaptor<IGuardianRepository>
+
+<CascadingValue Value="@this">
+    @ChildContent
+</CascadingValue>
+
+
+@code {
+  
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public List<Guardian> Guardians { get; set; }
+    
+    bool gridInitialized = false; 
+    
+    public override async Task<object> ReadAsync(DataManagerRequest dm, string key = null)
+    {   
+        if (!gridInitialized)
+        {
+            // Get data from API
+            Guardians = await Service.GetGuardiansAsync();        
+            gridInitialized = true;            
+        }
+
+        await Task.Yield();  
+        IEnumerable<Guardian> dataSource = Guardians; 
+
+        if (dm.Search != null && dm.Search.Count > 0)
+        {
+            // Searching
+            dataSource = DataOperations.PerformSearching(dataSource, dm.Search);
+        }
+        if (dm.Sorted != null && dm.Sorted.Count > 0)
+        {
+            // Sorting
+            dataSource = DataOperations.PerformSorting(dataSource, dm.Sorted);
+        }
+        if (dm.Where != null && dm.Where.Count > 0)
+        {
+            // Filtering
+            dataSource = DataOperations.PerformFiltering(dataSource, dm.Where, dm.Where[0].Operator);
+        }    
+
+        int count = dataSource.Cast<Guardian>().Count();
+
+        if (dm.Skip != 0)
+        {
+            dataSource = dataSource.Skip(dm.Skip); //Paging
+        }       
+    
+        if (dm.Take != 0)
+        {               
+            dataSource = dataSource.Take(dm.Take);
+        }
+        
+        return dm.RequiresCounts ? new DataResult() { Result = dataSource, Count = count } : (object)dataSource;
+    }  
+
+    public override async Task<object> InsertAsync(DataManager dm, object value, string key)
+    {
+        var guardian = value as Guardian;
+        if (guardian == null) return value;
+
+        var newGuardian = new GuardianCreation
+        {
+            FirstName = guardian.FirstName,
+            LastName = guardian.LastName,
+            Location = guardian.Location
+        };
+       
+        await Service.AddGuardianAsync(newGuardian);
+        Guardians?.Insert(0, guardian);
+        return value;
+    }   
+
+    public override async Task<object> UpdateAsync(DataManager dm, object value, string keyField, string key)
+    {
+        var guardian = (value as Guardian);
+        if (guardian == null) return value;
+        var guardianEdit = new GuardianEdit
+        {
+            FirstName = guardian.FirstName,
+            LastName = guardian.LastName,
+            Location = guardian.Location
+        };
+
+        // So the record in the grid will immediately update
+        var guardianFromCache = Guardians.FirstOrDefault(g => g.GuardianID == guardian.GuardianID);
+        if (guardianFromCache != null)
+        {
+            guardianFromCache.FirstName = guardian.FirstName;
+            guardianFromCache.LastName = guardian.LastName;
+            guardianFromCache.Location = guardian.Location;
+        }
+        
+        await Service.UpdateGuardianAsync(guardian.GuardianID, guardianEdit);
+        return value;
+    }  
+
+    public override async Task<object> RemoveAsync(DataManager dm, object value, string keyField, string key)
+    {            
+        int guardianId;  
+        if (int.TryParse(value.ToString(), out guardianId)) {
+            await Service.DeleteGuardianAsync(guardianId);
+            var guardianToDelete = Guardians.FirstOrDefault(x => x.GuardianID == guardianId);
+            Guardians.Remove(guardianToDelete);
+        }       
+        return value;
+    }  
+
+}

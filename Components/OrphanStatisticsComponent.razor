@@ -1,0 +1,86 @@
+﻿@using Syncfusion.Blazor.Charts
+@using LegendPosition = Syncfusion.Blazor.Charts.LegendPosition
+@inject NavigationManager NavigationManager
+@inject IDashboardRepository DashboardRepository
+
+
+
+<div class="control-section" hidden="@hideChart">
+    <SfAccumulationChart SelectionMode="AccumulationSelectionMode.Point" Title="Orphan Statistics" SelectionPattern="SelectionPattern.DiagonalForward">
+    <AccumulationChartEvents Load="BeforeRender"/>
+        <AccumulationChartTooltipSettings Enable="false"></AccumulationChartTooltipSettings>
+        <AccumulationChartLegendSettings ToggleVisibility=false Position="LegendPosition.Right" Height="28%" Width="44%"></AccumulationChartLegendSettings>
+        <AccumulationChartSeriesCollection>
+            <AccumulationChartSeries DataSource="@DataSource" XName="xValue" YName="yValue" Name="Revenue" InnerRadius="40%">
+                <AccumulationDataLabelSettings Name="${point.y}" Visible="true">
+                    <AccumulationChartDataLabelFont FontWeight="600" Color="white"></AccumulationChartDataLabelFont>
+                </AccumulationDataLabelSettings>
+            </AccumulationChartSeries>
+        </AccumulationChartSeriesCollection>
+    </SfAccumulationChart>
+</div>
+
+
+<div hidden="@hideLoadingAnimation">
+    <LoadingComponent />
+</div>
+
+
+@code {
+    
+    OrphanStatistics orphanStatistics = null;
+    bool hideLoadingAnimation = false;
+    bool hideChart = true;
+    bool gotData = false;
+    public class PieData
+    {
+        public string xValue { get; set; }
+        public double yValue { get; set; }
+        public string text { get; set; }
+    }
+
+    public List<PieData> DataSource = new List<PieData>();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        orphanStatistics = await DashboardRepository.GetOrphanStatistics();
+        
+        DataSource = new List<PieData>
+        {
+            new PieData { xValue = "Active",  yValue = (double)orphanStatistics.ActiveCount, text = orphanStatistics.ActiveCountText },
+            new PieData { xValue = "Inactive",  yValue = (double)orphanStatistics.InactiveCount, text = orphanStatistics.InactiveCountText },
+            new PieData { xValue = "Unspecified",  yValue = (double)orphanStatistics.UnknownCount, text = orphanStatistics.UnknownCountText },
+        };
+    }
+    
+    string CurrentUri;
+    
+    void BeforeRender(IAccLoadedEventArgs Args)
+    {
+        CurrentUri = NavigationManager.Uri;
+        if (CurrentUri.IndexOf("material") > -1)
+        {
+            Args.Theme = AccumulationTheme.Material;
+        }
+        else if (CurrentUri.IndexOf("fabric") > -1)
+        {
+            Args.Theme = AccumulationTheme.Fabric;
+        }
+        else if (CurrentUri.IndexOf("bootstrap") > -1)
+        {
+            Args.Theme = AccumulationTheme.Bootstrap;
+        }
+        else if (CurrentUri.IndexOf("highcontrast") > -1)
+        {
+            Args.Theme = AccumulationTheme.HighContrast;
+        }
+        else
+        {
+            Args.Theme = AccumulationTheme.Bootstrap4;
+        }
+
+        hideChart = false;
+        hideLoadingAnimation = true;
+    }
+    
+}

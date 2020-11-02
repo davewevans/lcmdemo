@@ -1,0 +1,93 @@
+﻿@using Syncfusion.Blazor.Navigations
+
+@page "/sftabdemo"
+
+<h3>SfTabDemo</h3>
+<br><br>
+
+
+
+<SfTab CssClass="tab-adaptive e-background e-accent" 
+       HeaderPlacement="HeaderPosition.Top" 
+       OverflowMode="OverflowMode.Popup">
+        <TabItems>
+            <TabItem>
+                <ChildContent>
+                    <TabHeader Text="Profile"></TabHeader>
+                </ChildContent>
+                <ContentTemplate>
+                    <Test />
+                </ContentTemplate>
+            </TabItem>
+            <TabItem>
+                <ChildContent>
+                    <TabHeader Text="Academics"></TabHeader>
+                </ChildContent>
+                <ContentTemplate>
+                    <Test/>
+                </ContentTemplate>
+            </TabItem>
+            <TabItem>
+                <ChildContent>
+                    <TabHeader Text="Narrations"></TabHeader>
+                </ChildContent>
+                <ContentTemplate>
+                    <Test />
+                </ContentTemplate>
+            </TabItem>
+            <TabItem>
+                <ChildContent>
+                    <TabHeader Text="Guardians"></TabHeader>
+                </ChildContent>
+                <ContentTemplate>
+                    <Test />
+                </ContentTemplate>
+            </TabItem>
+            <TabItem>
+                <ChildContent>
+                    <TabHeader Text="Sponsors"></TabHeader>
+                </ChildContent>
+                <ContentTemplate>
+                    <Test />
+                </ContentTemplate>
+            </TabItem>
+            <TabItem>
+                <ChildContent>
+                    <TabHeader Text="Pictures"></TabHeader>
+                </ChildContent>
+                <ContentTemplate>
+                    <Test/>
+                </ContentTemplate>
+            </TabItem>
+        </TabItems>
+    </SfTab>
+    
+
+    
+    
+<style>
+    .e-content .e-item {
+        font-size: 24px;
+        padding: 10px;
+        text-align: justify;
+        background: whitesmoke;
+    }
+
+    @@media screen and (max-width: 425px) {
+        .tab-adaptive {
+            overflow: hidden;
+        }
+
+        .tab-adaptive .e-content {
+            height: inherit !important;
+        }
+
+        .tab-adaptive .e-item.e-active {
+            overflow: scroll;
+        }
+    }
+</style>
+
+@code {
+    
+}

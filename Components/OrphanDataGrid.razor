@@ -1,0 +1,181 @@
+@using LCMSMSPWA.Adaptors
+@inject IOrphanRepository OrphanRepository
+@inject NavigationManager NavigationManager
+
+
+<SfGrid TValue="Orphan"
+        AllowPaging="true" 
+        AllowSorting="true"
+        AllowFiltering="true"
+        Toolbar="@ToolbarItems"
+        AllowSelection="true"
+        AllowReordering="true"
+        AllowResizing="true"
+        AllowTextWrap="true"
+        AllowExcelExport="true"
+        AllowPdfExport="true">   
+
+        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>    
+        
+        <GridPageSettings 
+            PageSize="20" 
+            PageSizes="@PageSizes">
+        </GridPageSettings>
+
+        <GridSelectionSettings EnableToggle="true" EnableSimpleMultiRowSelection="false"></GridSelectionSettings>
+
+        <GridEvents TValue="Orphan"></GridEvents>
+
+    <SfDataManager Adaptor="Adaptors.CustomAdaptor">
+        <OrphanCustomAdaptor></OrphanCustomAdaptor>
+    </SfDataManager>
+    
+    <GridEditSettings 
+         AllowAdding="true" 
+         AllowEditing="true" 
+         AllowDeleting="true" 
+         Mode="EditMode.Normal"
+         AllowEditOnDblClick="true"
+         ShowDeleteConfirmDialog="true">
+    </GridEditSettings>
+    
+    <GridColumns>
+        <GridColumn Field="@nameof(Orphan.OrphanID)" IsPrimaryKey="true" AllowEditing="false" Visible="false" />
+        <GridColumn Type="ColumnType.CheckBox" Width="30" AllowEditing="false" />
+        <GridColumn Width="50" AllowEditing="false"> 
+            <Template> 
+                @{ 
+                    var _orphan = (context as Orphan); 
+                    <img src="@_orphan?.ProfilePicUrl"
+                         class="rounded-full" style="max-height:100px;"
+                         alt="@_orphan?.FullName" />
+                } 
+            </Template> 
+        </GridColumn> 
+
+        <GridColumn Field="@nameof(Orphan.FirstName)" 
+                    HeaderText="First Name" 
+                    Width="80"
+                    ValidationRules="@(new ValidationRules{ Required=true, MaxLength=255 })" />
+        <GridColumn Field="@nameof(Orphan.MiddleName)"  
+                    HeaderText="Middle Name"  
+                    Width="80"
+                    HideAtMedia="(min-width: 480px)" 
+                    ValidationRules="@(new ValidationRules{ MaxLength=255 })" /> 
+        <GridColumn Field="@nameof(Orphan.LastName)" 
+                    HeaderText="Last Name" 
+                    Width="80"
+                    ValidationRules="@(new ValidationRules{ MaxLength=255 })" />   
+
+        <GridColumn Field="@nameof(Orphan.Gender)" 
+                    HeaderText="Gender" 
+                    Width="60"
+                    HideAtMedia="(min-width: 480px)"
+                    EditType="EditType.DropDownEdit" DataSource="@GenderOptions">
+                         <EditTemplate>
+                    @{  
+                        var _orphan = (context as Orphan); 
+                        <SfComboBox TValue="string" TItem="GenderOption" @bind-Value="@_orphan.Gender" Placeholder="Select Gender" DataSource="@GenderOptions">
+                            <ComboBoxFieldSettings Value="ID" Text="Text"></ComboBoxFieldSettings>
+                        </SfComboBox>
+                    }
+                    </EditTemplate>                                 
+        </GridColumn>
+        <GridColumn Field="@nameof(Orphan.DateOfBirth)" 
+                    HeaderText="DOB" Format="d" Width="60" Type="ColumnType.Date" 
+                    HideAtMedia="(min-width: 480px)" />
+        <GridColumn HeaderText="Status" 
+                    Width="60"
+                    Field ="@nameof(Orphan.LCMStatus)"
+                    HideAtMedia="(min-width: 768px)">    
+                    <Template> 
+                        @{ 
+                            var _orphan = (context as Orphan);                     
+                            if (_orphan?.LCMStatus != null && _orphan.LCMStatus.Equals("Not Active")) {
+                                <span class="px-2 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 text-red-800">@_orphan?.LCMStatus</span>
+                            } else {
+                                <span class="px-2 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">@_orphan?.LCMStatus</span>
+                            }                            
+                        } 
+                    </Template>    
+                    <EditTemplate>
+                    @{   
+                        var _orphan = (context as Orphan); 
+                        <SfComboBox TValue="string" TItem="StatusOption" @bind-Value="@_orphan.LCMStatus" Placeholder="Select Status" DataSource="@StatusOptions">
+                            <ComboBoxFieldSettings Value="ID" Text="Text"></ComboBoxFieldSettings>
+                        </SfComboBox>
+                    }
+                    </EditTemplate>                                 
+        </GridColumn>
+        <GridColumn Field="@nameof(Orphan.ProfileNumber)" 
+                    HeaderText="Profile #"
+                    Width="60"
+                    HideAtMedia="(min-width: 768px)"
+                    ValidationRules="@(new ValidationRules{ MaxLength=30 })" />
+
+        <GridColumn HeaderText="Profile" TextAlign="Syncfusion.Blazor.Grids.TextAlign.Center" Width="80" AllowEditing="false">
+            <Template>
+                @{
+                    var _orphan = (context as Orphan);
+                    <SfButton Content="@ProfileBtnContent" CssClass="e-link" @onclick="@(() => Navigate(_orphan.OrphanID))"> </SfButton>
+                  
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</SfGrid>
+
+
+
+
+<style>
+    .badge {
+        font-size: 14px;
+    }
+    .e-grid .e-gridcontent .e-rowcell.test {
+        color: green;
+    }
+</style>
+
+
+@code {
+    private bool gotData = false;
+
+    public List<string> ToolbarItems = new List<string> { "Add", "Edit", "Delete", "Update", "Cancel", "Search" };
+
+    public int[] PageSizes = {5, 10, 20, 50, 100};
+
+    public string ProfileBtnContent = "View";
+
+    private void Navigate(int id)
+    {
+        NavigationManager.NavigateTo($"/orphandetails/{ id }");
+    }
+
+
+    public class StatusOption
+    {
+        public string ID { get; set; }
+        public string Text { get; set; }
+    }
+
+    List<StatusOption> StatusOptions = new List<StatusOption>
+    {
+        new StatusOption() { ID="Active", Text="Active"},
+        new StatusOption() { ID="Not Active", Text="Not Active"},
+    };
+
+
+    public class GenderOption
+    {
+        public string ID { get; set; }
+        public string Text { get; set; }
+    }
+
+    List<GenderOption> GenderOptions = new List<GenderOption>
+    {
+        new GenderOption() { ID="Male", Text="Male"},
+        new GenderOption() { ID="Female", Text="Female"},
+    };
+}
+

@@ -1,0 +1,162 @@
+﻿@page "/play"
+@using System.IO
+@using Syncfusion.Blazor.FileManager
+@inject IPictureRepository PictureRepository
+
+
+<h3>Play</h3>
+
+<h2>@picUrl</h2>
+
+<InputFile OnChange="HandleFileSelected"
+           accept="image/png,image/gif,image/jpeg" />
+
+@if (file != null)
+{
+    <p>Name: @file.Name</p>
+    <p>Size in bytes: @file.Size</p>
+    <p>Last modified date: @file.LastModified.ToShortDateString()</p>
+    <p>Content type (not always supplied by the browser): @file.Type</p>
+    <p>Number of lines read: @numLines</p>
+    <button @onclick="CountLines">Count</button>
+    
+    
+    isLoading = file.Data.Position > 0;
+}
+
+
+@if (file != null)
+{
+    <div class="file-row">
+                <!-- File info -->
+                <div>
+                    <h2>@file.Name</h2>
+                    Size: <strong>@file.Size bytes</strong>;
+                    Last modified: <strong>@file.LastModified.ToShortDateString()</strong>;
+                    Type: <strong>@file.Type</strong>
+                    Relative Path: <strong>@file.RelativePath</strong>
+                </div>
+    
+                <!-- Upload button -->
+                <button @onclick="HandleFileUpload" disabled="@isLoading">
+                    @if (!isLoading)
+                    {
+                        <span>Upload</span>
+                    }
+                    else
+                    {
+                        <span>Uploaded @((100.0 * file.Data.Position / file.Size).ToString("0"))%</span>
+                    }
+                </button>
+            </div>
+}
+
+<br><br>
+<h3 class="text-red-500 font-bold">@status</h3>
+        
+
+@code {
+
+    int numLines;
+    IFileListEntry file;
+    bool isLoading = false;    
+  
+    string fileName = string.Empty;
+    string type = string.Empty;
+    string size = string.Empty;
+
+    string picUrl = "No Pic URL";
+    
+    // Stream fileStream = null;
+    
+    const string DefaultStatus = "Drop a text file here to view it, or click to choose a file";
+    const int MaxFileSize = 5 * 1024 * 1024; // 5MB
+    string status = DefaultStatus;
+
+    string fileTextContents;
+
+
+    async Task HandleFileSelected(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+        
+        // if (file == null)
+        // {
+        //     return;
+        // }
+        // else if (file.Size > MaxFileSize)
+        // {
+        //     status = $"That's too big. Max size: {MaxFileSize} bytes.";
+        // }
+        // else
+        // {
+        //     status = "Loading...";
+        //
+        //     using (var reader = new StreamReader(file.Data))
+        //     {
+        //         fileTextContents = await reader.ReadLineAsync();
+        //         fileName = file.Name;
+        //         
+        //     }
+        //
+        //     status = DefaultStatus;
+        // }
+    }
+
+    private async Task HandleFileUpload()
+    {
+        await UploadFileAsync();
+        StateHasChanged();
+    }
+    
+    private async Task UploadFileAsync()
+    {
+        // So the UI updates to show progress
+        // file.OnDataRead += (sender, eventArgs) => InvokeAsync(StateHasChanged);
+
+        fileName = file.Name;
+        
+        if (file != null)
+        {
+            IFileListEntry  selectedImage = await file.ToImageFileAsync(file.Type, 512, 512);
+            selectedImage.OnDataRead += (sender, eventArgs) => InvokeAsync(StateHasChanged);
+            var fileStream= new MemoryStream();
+            await selectedImage.Data.CopyToAsync(fileStream);
+            
+            //await using var fileStream = new MemoryStream((int)file.Size);
+            //await file.Data.CopyToAsync(fileStream);
+
+            var picCreation = new PictureCreation
+            {
+                PictureFileName = fileName,
+                SetAsProfilePic = true,
+                OrphanID = 600
+            };
+    
+            string result = await PictureRepository.UploadImageAsync(picCreation, fileStream.ToArray());
+            
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                picUrl = result; 
+            }    
+        }
+            
+            
+    }
+    
+    
+    
+
+    async Task CountLines()
+    {
+        numLines = 0;
+        using (var reader = new System.IO.StreamReader(file.Data))
+        {
+            while (await reader.ReadLineAsync() != null)
+            {
+                numLines++;
+            }
+        }
+    }
+
+}

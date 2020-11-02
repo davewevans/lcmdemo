@@ -1,0 +1,53 @@
+﻿<h3>OrphanTable</h3>
+
+@if (Orphans.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Name</th>
+                <th scope="col">Gender</th>
+                <th scope="col">Birth Date</th>
+                <th scope="col">LCM Status</th>
+                <th scope="col">Profile Number</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var orphan in Orphans)
+        {
+            <tr>
+                <td>
+                    <img src="@orphan.ProfilePicUrl" alt="@orphan.FullName" class="img-thumbnail custom-thumbnail" />
+                </td>
+                <td class="align-middle">
+                    @orphan.FullName
+                </td>
+                <td class="align-middle">
+                    @orphan.Gender
+                </td>
+                <td class="align-middle">
+                    @orphan.DateOfBirth?.ToString("MM/dd/yyyy")
+                </td>
+                <td class="align-middle">
+                    @orphan.LCMStatus
+                </td>
+                <td class="align-middle">
+                    @orphan.ProfileNumber
+                </td>
+                <td class="align-middle">
+                    <button type="button" @onclick="() => ViewDetails(orphan.OrphanID)" class="btn btn-info">Details</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+   <img src="images/Spinner-1s-200px.gif" height="150" width="150" />
+}
+
+<br /><br /><br />
+<button type="button" @onclick="NavigateToHome" class="btn btn-info">GO Home!</button>

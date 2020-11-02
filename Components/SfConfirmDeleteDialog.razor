@@ -1,0 +1,132 @@
+﻿
+@using Syncfusion.Blazor.Popups
+
+
+
+<SfDialog @bind-Visible="@ConfirmDlgVisible" Width="400px" Target="#target" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Header>
+            @ConfirmationTitle
+        </Header>
+        <Content>
+            @ConfirmationMessage
+        </Content>
+    </DialogTemplates>
+    <DialogEvents OnOpen="@BeforeDialogOpen"  Closed="@DialogClose"></DialogEvents>
+    <DialogButtons>
+        <DialogButton Content="Yes" CssClass="confirm-btn" IconCss="confirm-icon" IsPrimary="true" OnClick="@OnConfirm" />
+        <DialogButton Content="Cancel" IconCss="cancel-icon" OnClick="@OnCancel" />
+    </DialogButtons>
+</SfDialog>
+
+
+
+<style>
+
+     .e-btn.e-flat.e-primary, .e-btn.e-flat.e-primary:focus {
+        background-color: red;
+        border-color: #265f91;
+        color: #fff;
+     }
+    
+    .e-btn.e-flat.e-primary:hover, .e-btn.e-flat.e-primary:active {
+        background-color: darkred;
+        border-color: #163854;
+        color: #fff;
+    }
+
+  .confirm-icon::before {
+        font-family: "Font Awesome 5 Free"; 
+        font-weight: 900; 
+        content: "\f1f8";  
+    }
+    
+    .cancel-icon::before {
+            font-family: "Font Awesome 5 Free"; 
+            font-weight: 900; 
+            content: "\f00d";  
+        }
+
+    .e-btn-hide {
+        display: none;
+    }
+
+    .Table {
+        border-collapse: separate;
+        border-spacing: 10px;
+        width: 85%;
+        margin: 0px -5px 0px;
+    }
+
+    .dlgbtn {
+        margin-right: 10px;
+    }
+
+    #target {
+        height: 460px;
+        min-height: 350px;
+    }
+
+    .dlgbtn {
+        margin-right: 10px;
+    }
+
+    .fabric #target #prompt_dialog.e-dialog {
+        height: 291px;
+    }
+
+    .material #target #prompt_dialog.e-dialog {
+        height: 270px;
+    }
+
+    #target #prompt_dialog.e-dialog {
+        height: 270px;
+    }
+
+    .bootstrap4 #target #prompt_dialog.e-dialog {
+        height: 285px;
+    }
+</style>
+
+@code {
+    
+    [Parameter]
+    public string ConfirmationTitle { get; set; } = "Confirm Delete";
+
+    [Parameter]
+    public string ConfirmationMessage { get; set; } = "Are you sure you want to delete?";
+    
+    [Parameter]
+    public EventCallback<bool> ConfirmationChanged { get; set; }
+    
+    private bool ShowButtons { get; set; } = true;
+    private bool ConfirmDlgVisible { get; set; } = false;
+
+
+    public void ShowDialog()
+    {
+        this.ConfirmDlgVisible = true;
+    }
+
+    private async Task OnConfirm()
+    {
+        this.ConfirmDlgVisible = false;
+        await ConfirmationChanged.InvokeAsync(true);
+    }
+
+    private async Task OnCancel()
+    {
+        this.ConfirmDlgVisible = false;
+        await ConfirmationChanged.InvokeAsync(false);
+    }
+
+    private void BeforeDialogOpen(Syncfusion.Blazor.Popups.BeforeOpenEventArgs args)
+    {
+        this.ShowButtons = false;
+    }
+
+    private void DialogClose(CloseEventArgs args)
+    {
+        this.ShowButtons = true;
+    }
+}

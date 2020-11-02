@@ -1,0 +1,68 @@
+
+
+@page "/comboboxdemo"
+
+
+<div>
+    <SfComboBox TValue="string" TItem="Games" Placeholder="Select a game" DataSource="@LocalData">
+        <ComboBoxFieldSettings Value="ID" Text="Text"></ComboBoxFieldSettings>
+    </SfComboBox>
+</div>
+<div>
+    <SfComboBox TValue="string" TItem="StatusOption" Placeholder="Select Status" DataSource="@StatusOptions">
+        <ComboBoxFieldSettings Value="ID" Text="Text"></ComboBoxFieldSettings>
+    </SfComboBox>
+</div>
+<div>
+    <SfComboBox TValue="string" TItem="GenderOption" Placeholder="Select Gender" DataSource="@GenderOptions">
+        <ComboBoxFieldSettings Value="ID" Text="Text"></ComboBoxFieldSettings>
+    </SfComboBox>
+</div>
+
+@code {
+    
+public class Games
+  {  
+    public string ID { get; set; }
+    public string Text { get; set; }
+  }
+  List<Games> LocalData = new List<Games> {
+    new Games() { ID= "Game1", Text= "American Football" },
+    new Games() { ID= "Game2", Text= "Badminton" },
+    new Games() { ID= "Game3", Text= "Basketball" },
+    new Games() { ID= "Game4", Text= "Cricket" },
+    new Games() { ID= "Game5", Text= "Football" },
+    new Games() { ID= "Game6", Text= "Golf" },
+    new Games() { ID= "Game7", Text= "Hockey" },
+    new Games() { ID= "Game8", Text= "Rugby"},
+    new Games() { ID= "Game9", Text= "Snooker" },
+    new Games() { ID= "Game10", Text= "Tennis"},
+  };
+
+
+  public class StatusOption
+  {
+    public string ID { get; set; }
+    public string Text { get; set; }
+  }
+
+  List<StatusOption> StatusOptions = new List<StatusOption> 
+    {
+            new StatusOption() { ID="Active", Text="Active"},
+            new StatusOption() { ID="Not Active", Text="Not Active"},
+    };
+
+
+public class GenderOption
+  {
+    public string ID { get; set; }
+    public string Text { get; set; }
+  }
+
+  List<GenderOption> GenderOptions = new List<GenderOption> 
+    {
+            new GenderOption() { ID="Male", Text="Male"},
+            new GenderOption() { ID="Female", Text="Female"},
+    };
+      
+  }

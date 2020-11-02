@@ -1,0 +1,18 @@
+﻿
+@if (Orphan != null)
+{
+     <div class="flex flex-wrap w-full justify-center">
+         <div class="w-10/12 sm:w-8/12 px-4">
+             <img src="@Orphan.ProfilePicUrl" alt="@Orphan.FullName" class="shadow-lg rounded max-w-full h-auto align-middle border-none" />
+         </div>
+     </div>
+}
+
+
+
+
+@code
+{
+    [Parameter]
+    public OrphanDetailsModel Orphan { get; set; }
+}

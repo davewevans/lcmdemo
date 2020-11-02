@@ -1,0 +1,134 @@
+﻿@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Buttons
+
+<SfDialog Width="500px" @bind-Visible="@IsVisible" IsModal="true" ShowCloseIcon="true">
+    <DialogTemplates>
+        <Header>
+            <h3 class="text-3xl font-semibold">Assign Guardian to Orphan</h3>
+        </Header>
+        <Content>
+            <div class="w-full m-6 text-gray-600 text-xl">
+                Assign Guardian to <br>@Orphan.FullName
+            </div>
+            <div class="w-11/12 m-6 mr-6">
+                @if (gotData)
+                {
+                    <SfAutoComplete
+                        TValue="string"
+                        TItem="Guardian"
+                        @bind-Value="@selectedValue"
+                        Placeholder="Select Guardian"
+                        DataSource="@guardians"
+                        PopupHeight="400px"
+                        PopupWidth="380px">
+
+                        <AutoCompleteFieldSettings
+                            Value="NameAndLocation">
+                        </AutoCompleteFieldSettings>
+                    </SfAutoComplete>
+                }
+                else
+                {
+                    <div class="text-center h-40">
+                        <LoadingComponent />
+                    </div>
+                    
+                }
+
+
+            </div>
+        </Content>
+    </DialogTemplates>
+    <DialogButtons>
+        <DialogButton OnClick="@HandleValidSubmit">
+            <DialogButtonModel Content="Save" IsPrimary="true"></DialogButtonModel>
+        </DialogButton>
+        <DialogButton OnClick="@OnCancelBtnClick">
+            <DialogButtonModel Content="Cancel"></DialogButtonModel>
+        </DialogButton>
+    </DialogButtons>
+</SfDialog>
+
+<style>
+    .e-btn.e-flat.e-primary, .e-btn.e-flat.e-primary:focus {
+        background-color: #317ab9;
+        border-color: #265f91;
+        color: #fff;
+    }
+
+    .e-btn.e-flat.e-primary:hover, .e-btn.e-flat.e-primary:active {
+        background-color: #21527d;
+        border-color: #163854;
+        color: #fff;
+    }
+</style>
+
+@code {
+
+    private bool gotData = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        guardians = await GuardianRepository.GetGuardiansAsync();
+        foreach (var guardian in guardians)
+        {
+            guardian.NameAndLocation = $"{ guardian.FullName } ({ guardian.Location })";
+        }
+
+        gotData = guardians != null;
+    }
+
+    private List<Guardian> guardians;
+
+    private string selectedValue = string.Empty;
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public OrphanDetailsModel Orphan { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnAddNewComplete { get; set; }
+
+    [Inject]
+    public IGuardianRepository GuardianRepository { get; set; }
+
+    [Inject]
+    public IOrphanRepository OrphanRepository { get; set; }
+
+
+    [Inject]
+    protected IMatToaster Toaster { get; set; }
+    
+
+    private async Task HandleValidSubmit()
+    {
+        if (Orphan == null)
+        {
+            Toaster.Add($" No Orphan record found.", MatToastType.Danger);
+            return;
+        }
+
+        var selectedGuardian = guardians.FirstOrDefault(g => g.NameAndLocation.Equals(selectedValue));
+        
+        if (selectedGuardian == null)
+        {
+            Toaster.Add($" No Guardian selected.", MatToastType.Danger);
+            return;
+        }
+    
+        await OrphanRepository.PatchOrphanAsync(Orphan.OrphanID, "guardianID", selectedGuardian.GuardianID.ToString());
+        IsVisible = false;
+        await OnAddNewComplete.InvokeAsync(true);
+        StateHasChanged();
+        Toaster.Add($" Successful assignment.", MatToastType.Success);
+    }
+
+    private async Task OnCancelBtnClick()
+    {
+        IsVisible = false;
+        await OnAddNewComplete.InvokeAsync(false);
+    }
+
+}

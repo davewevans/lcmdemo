@@ -1,0 +1,13 @@
+﻿<h3>Child</h3>
+
+<button class="bg-green-300" type="button" value="Send" @onclick="SendMessage">Send</button>
+
+@code {
+    [Parameter]
+    public EventCallback<string> SendParentMessage { get; set; }
+
+    private async Task SendMessage()
+    {
+        await SendParentMessage.InvokeAsync("Hi Mom! This is a message from the child component");
+    }
+}

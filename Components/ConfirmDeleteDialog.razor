@@ -1,0 +1,54 @@
+@page "/confirmDeletedemo"
+
+@using Syncfusion.Blazor.Popups
+
+<div>
+    <button class="e-btn dlgbtn" @onclick="@ConfirmBtn">Confirm</button>
+</div>
+
+<div>
+    <SfDialog @bind-Visible="@ConfirmDlgVisible" Width="400px" Target="#target" ShowCloseIcon="true">
+        <DialogTemplates>
+            <Header>
+                @HeaderMsg
+            </Header>
+            <Content>
+                @Message
+            </Content>
+        </DialogTemplates>
+        <DialogEvents Closed="@DialogClose"></DialogEvents>
+        <DialogButtons>
+            <DialogButton Content="Yes" IsPrimary="true" OnClick="@HideDialog" />
+            <DialogButton Content="Cancel" OnClick="@HideDialog" />
+        </DialogButtons>
+    </SfDialog>
+</div>
+
+@code {
+
+    public string HeaderMsg = "Confirm Delete";
+    public string Message = "Are your sure you want to delete?";    
+    public bool ConfirmDlgVisible = false;
+    private void ConfirmBtn()
+    {
+        this.ConfirmDlgVisible = true;
+    }
+
+     private void HideDialog(Object e)
+    {
+        Console.WriteLine(e.ToString());
+        this.ConfirmDlgVisible = false;       
+    }
+
+    private void DialogClose(CloseEventArgs args)
+    {
+        if (args.Cancel) {
+            Console.WriteLine("canceled");
+        }
+        else {
+            Console.WriteLine("confirmed");
+        }
+
+        Console.WriteLine(args.Cancel);       
+    }
+}

@@ -1,0 +1,16 @@
+﻿@page "/logout"
+@using LCMSMSPWA.Auth
+
+@inject ILoginService loginService
+@inject NavigationManager navigationManager
+
+
+<text>Logging out...</text>
+
+@code{
+    protected async override Task OnInitializedAsync()
+    {
+        await loginService.Logout();
+        navigationManager.NavigateTo("/login");
+    }
+}

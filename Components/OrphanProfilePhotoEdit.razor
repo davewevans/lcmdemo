@@ -1,0 +1,151 @@
+﻿@using System.IO;
+@using Tewr.Blazor.FileReader
+@inject IFileReaderService FileReader
+@inject IPictureRepository PicHttpRepository
+
+
+<div class="border border-dashed border-gray-500 relative">
+    <input type="file" 
+           @ref="inputReference" 
+           @onchange="@HandleFileUpload"
+           class="cursor-pointer relative block opacity-0 w-full h-full p-20 z-50">
+    <div class="text-center p-10 absolute top-0 right-0 left-0 m-auto">
+        <h4>
+            Drop an image file in this box to upload
+            <br/>or
+        </h4>
+        <p class="text-xl">Click to Select a Photo</p>
+    </div>
+</div>
+
+
+@if (progress.HasValue)
+{
+    @if (progress < 100)
+    {
+        <div class="shadow w-full bg-grey-light">
+            <div class="bg-blue text-xs leading-none py-1 text-center text-white" style="width: @progress%">@progress%</div>
+        </div>
+    }
+    else
+    {
+        <p class="@statusClass">@status</p>
+    }
+}
+
+@if (uploadFailed)
+{
+    <p class="@statusClass">@status</p>
+}
+ 
+ 
+@code {
+    
+    [Parameter]
+    public OrphanDetailsModel Orphan { get; set; }
+    
+    [Parameter]
+    public EventCallback<OrphanDetailsModel> HandleProfilePhotoChanged{ get; set; }
+
+    string status = "";
+    string statusClass = "";
+    bool uploadFailed = false;
+    int maxFileSizeMb = 10;
+
+    readonly string[] allowedContentTypes = { "image/jpeg", "image/png", "image/gif" };
+    
+    ElementReference inputReference;
+
+    private int? progress;
+
+    private async Task HandleFileUpload()
+    {
+        int countSize = 0;
+        uploadFailed = false;
+        status = "";
+
+        // Read the file
+        var file = (await FileReader.CreateReference(inputReference).EnumerateFilesAsync()).FirstOrDefault();
+
+        if (file != null)
+        {
+            var fileInfo = await file.ReadFileInfoAsync();
+
+            if (!IsValidFile(fileInfo.Type, fileInfo.Size)) return;
+
+            byte[] fileBytes;
+            await using (var ms = new MemoryStream())
+            {
+                await using (var fs = await file.OpenReadAsync())
+                {
+                    var bufferSize = 4096;
+                    var buffer = new byte[bufferSize];
+                    int count;
+                    while ((count = await fs.ReadAsync(buffer, 0, buffer.Length)) != 0)
+                    {
+                        ms.Write(buffer, 0, count);
+                        countSize += count;
+                        progress = (int)(((decimal)countSize / fileInfo.Size) * 97);
+                        StateHasChanged();
+                    }
+                
+                    fileBytes = ms.ToArray();
+                }
+            }  
+        
+            var picCreation = new PictureCreation
+            {
+                PictureFileName = fileInfo.Name,
+                SetAsProfilePic = true,
+                ContentType = fileInfo.Type,
+                OrphanID = Orphan.OrphanID
+            };
+        
+            string result = await PicHttpRepository.UploadImageAsync(picCreation, fileBytes);
+
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                Orphan.ProfilePicUrl = result;
+                await HandleProfilePhotoChanged.InvokeAsync(Orphan);
+            }
+            ShowStatus(result);
+        }
+    }
+
+    private void ShowStatus(string result)
+    {
+        if (string.IsNullOrWhiteSpace(result))
+        {
+            status = "Something went wrong :(";
+            statusClass = "text-red-600 text-2xl";
+            uploadFailed = true;
+        }
+        else
+        {
+            progress = 100;
+            status = "Upload Success!";
+            statusClass = "text-green-600 text-2xl";
+        }
+    }
+
+    private bool IsValidFile(string type, long size)
+    {
+        if (!allowedContentTypes.Contains(type))
+        {
+            uploadFailed = true;
+            status = "Please select a .png, .jpg, or .gif file.";
+            statusClass = "text-red-600 text-2xl";
+            return false;
+        }
+
+        if (size > maxFileSizeMb * 1024 * 1024)
+        {
+            uploadFailed = true;
+            status = $"Max file size: {maxFileSizeMb}MB";
+            statusClass = "text-red-600 text-2xl";
+            return false;
+        }
+
+        return true;
+    }
+}
