@@ -1,0 +1,63 @@
+﻿.customNotFound {
+    text-align: center;
+    color: darkred;
+    font-size: 35px;
+    box-shadow: 1px 1px 1px grey;
+}
+
+.profile-row {
+    height: 50px;
+}
+
+.warning-text {
+    color: red;
+    font-weight: bold;
+}
+
+.info-text {
+    color: black;
+}
+
+.edit-icon {
+    color: darkgreen;
+}
+
+.delete-icon {
+    color: crimson;
+}
+
+.custom-thumbnail {
+    height: 150px;
+    width: auto;   
+}
+
+.custom-small-circle {
+    height: 100px;
+    width: auto;   
+}
+
+/* Make Bootstrap Cards responsive */
+@media (min-width: 576px) {
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-columns {
+        column-count: 3;
+    }
+}
+
+@media (min-width: 992px) {
+    .card-columns {
+        column-count: 4;
+    }
+}
+
+@media (min-width: 1200px) {
+    .card-columns {
+        column-count: 5;
+    }
+}
+/* End */
