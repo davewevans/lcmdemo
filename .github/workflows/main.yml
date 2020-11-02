@@ -6,8 +6,6 @@ on:
     branches: [ master ]
 
 jobs:
-   
-    
     deploy-to-github-pages:
     # use ubuntu-latest image to run steps on
     runs-on: ubuntu-latest
